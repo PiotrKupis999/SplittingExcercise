@@ -31,30 +31,30 @@ public class SplitterService {
         while (items.size() != 0){
 
             int maxSet = 0;
+            //find type of delivery with max amount of products
             for (String deliveryOption : deliveryGroups.keySet()){
                 if (deliveryGroups.get(deliveryOption).size() > maxSet){
                     maxKey = deliveryOption;
                     maxSet = deliveryGroups.get(deliveryOption).size();
                 }
             }
+
+            //put the biggest one to hashmap
             optimatedGroup.put(maxKey, deliveryGroups.get(maxKey));
+
+            //remove all used products from main list
             for (String product : deliveryGroups.get(maxKey)){
                 items.remove(product);
             }
 
-                deliveryGroups = GetSortedDeliveryGroups(items);
+            //sort the main list
+            deliveryGroups = GetSortedDeliveryGroups(items);
         }
 
-
-
         return optimatedGroup;
-
-
-
-
-
     }
 
+    //grouping the products by type of delivery
     public Map<String, List<String>> GetSortedDeliveryGroups(List<String> items) {
         Map<String, List<String>> deliveryGroups = new HashMap<>();
 
@@ -62,19 +62,12 @@ public class SplitterService {
             List<String> deliveryOptions = productDeliveryMap.get(item);
             if (deliveryOptions != null) {
                 for (String deliveryOption : deliveryOptions) {
-                    deliveryGroups.putIfAbsent(deliveryOption, new ArrayList<>());
-                }
-            }
-        }
+                    // check if the delivery option already exists in the deliveryGroups map
+                    // if not, add it with an empty list
+                    List<String> groupItems = deliveryGroups.computeIfAbsent(deliveryOption, k -> new ArrayList<>());
 
-        for (String item : items) {
-            List<String> deliveryOptions = productDeliveryMap.get(item);
-            if (deliveryOptions != null) {
-                for (String deliveryOption : deliveryOptions) {
-                    List<String> groupItems = deliveryGroups.get(deliveryOption);
-                    if (groupItems != null) {
-                        groupItems.add(item);
-                    }
+                    // add the current item to the list of items for the current delivery option
+                    groupItems.add(item);
                 }
             }
         }
